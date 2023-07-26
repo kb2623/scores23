@@ -1,14 +1,15 @@
 # encoding=utf8
-# This is temporary fix to import module from parent folder
-# It will be removed when package is published on PyPI
 import sys
 import timeit
 
 import numpy as np
 from numpy.random import rand
 
+from cec2013lsgo.cec2013 import Benchmark
+
 from niapy.task import Task
 from niapy.problems import Problem
+
 from niapy.algorithms.analysis import (
     RecursiveDifferentialGrouping, 
     ExtendedDifferentialGrouping
@@ -21,8 +22,6 @@ from niapy.algorithms.basic import (
     HarmonySearch,
     BatAlgorithm
 )
-
-from cec2013lsgo.cec2013 import Benchmark
 
 
 class CEC2013lsgoTask(Task):
