@@ -4,9 +4,6 @@
 import sys
 import timeit
 
-sys.path.append('./NiaPy')
-# End of fix
-
 import numpy as np
 from numpy.random import rand
 
