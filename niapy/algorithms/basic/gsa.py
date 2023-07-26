@@ -136,7 +136,7 @@ class GravitationalSearchAlgorithm(OptimizationAlgorithm):
         velocities = np.zeros((self.population_size, task.dimension))
         return population, fitness, {'velocities': velocities}
 
-    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, **params):
+    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, iters, **params):
         r"""Core function of GravitationalSearchAlgorithm algorithm.
 
         Args:
@@ -145,6 +145,7 @@ class GravitationalSearchAlgorithm(OptimizationAlgorithm):
             population_fitness (numpy.ndarray): Current populations fitness/function values.
             best_x (numpy.ndarray): Global best solution.
             best_fitness (float): Global best fitness/function value.
+            iters (int): Iteraration of the algorithm.
             **params (Dict[str, Any]): Additional arguments.
 
         Returns:
@@ -162,7 +163,7 @@ class GravitationalSearchAlgorithm(OptimizationAlgorithm):
         ib, iw = np.argmin(population_fitness), np.argmax(population_fitness)
         m = (population_fitness - population_fitness[iw]) / (population_fitness[ib] - population_fitness[iw])
         m = m / np.sum(m)
-        forces = np.asarray([[self.gravity((task.iters + 1)) * ((m[i] * m[j]) / (euclidean(population[i], population[j]) + self.epsilon)) * (
+        forces = np.asarray([[self.gravity((iters + 1)) * ((m[i] * m[j]) / (euclidean(population[i], population[j]) + self.epsilon)) * (
                 population[j] - population[i]) for j in range(len(m))] for i in range(len(m))])
         total_force = np.sum(self.random((self.population_size, task.dimension)) * forces, axis=1)
         a = total_force.T / (m + self.epsilon)

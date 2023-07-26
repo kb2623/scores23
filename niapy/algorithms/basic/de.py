@@ -7,10 +7,9 @@ import numpy as np
 from niapy.algorithms.algorithm import OptimizationAlgorithm, Individual, default_individual_init
 from niapy.util.array import objects_to_array
 
-__all__ = ['DifferentialEvolution', 'DynNpDifferentialEvolution', 'AgingNpDifferentialEvolution',
-           'MultiStrategyDifferentialEvolution', 'DynNpMultiStrategyDifferentialEvolution', 'AgingIndividual',
+__all__ = ['DifferentialEvolution', 'DynNpDifferentialEvolution',
            'cross_rand1', 'cross_rand2', 'cross_best2', 'cross_best1', 'cross_best2', 'cross_curr2rand1',
-           'cross_curr2best1', 'multi_mutations', 'proportional', 'linear', 'bilinear']
+           'cross_curr2best1', 'multi_mutations']
 
 logging.basicConfig()
 logger = logging.getLogger('niapy.algorithms.basic')
@@ -45,9 +44,11 @@ def cross_rand1(pop, ic, f, cr, rng, **_kwargs):
 
     """
     j = rng.integers(len(pop[ic]))
-    p = [1 / (len(pop) - 1.0) if i != ic else 0 for i in range(len(pop))] if len(pop) > 3 else None
-    r = rng.choice(len(pop), 3, replace=not len(pop) >= 3, p=p)
-    x = [pop[r[0]][i] + f * (pop[r[1]][i] - pop[r[2]][i]) if rng.random() < cr or i == j else pop[ic][i] for i in
+    r1, r2, r3 = ic, ic, ic
+    while r1 != ic: r1 = rng.integers(len(pop))
+    while r2 != ic and r2 != r1: r2 = rng.integers(len(pop))
+    while r3 != ic and r3 != r2 and r3 != r1: r3 = rng.integers(len(pop))
+    x = [pop[r1][i] + f * (pop[r2][i] - pop[r3][i]) if rng.random() < cr or i == j else pop[ic][i] for i in
          range(len(pop[ic]))]
     return np.asarray(x)
 
@@ -81,9 +82,10 @@ def cross_best1(pop, ic, f, cr, rng, x_b=None, **_kwargs):
 
     """
     j = rng.integers(len(pop[ic]))
-    p = [1 / (len(pop) - 1.0) if i != ic else 0 for i in range(len(pop))] if len(pop) > 2 else None
-    r = rng.choice(len(pop), 2, replace=not len(pop) >= 2, p=p)
-    x = [x_b[i] + f * (pop[r[0]][i] - pop[r[1]][i]) if rng.random() < cr or i == j else pop[ic][i] for i in
+    r1, r2 = ic, ic
+    while r1 != ic: r1 = rng.integers(len(pop))
+    while r2 != ic and r2 != r1: r2 = rng.integers(len(pop))
+    x = [x_b[i] + f * (pop[r1][i] - pop[r2][i]) if rng.random() < cr or i == j else pop[ic][i] for i in
          range(len(pop[ic]))]
     return np.asarray(x)
 
@@ -116,10 +118,14 @@ def cross_rand2(pop, ic, f, cr, rng, **_kwargs):
 
     """
     j = rng.integers(len(pop[ic]))
-    p = [1 / (len(pop) - 1.0) if i != ic else 0 for i in range(len(pop))] if len(pop) > 5 else None
-    r = rng.choice(len(pop), 5, replace=not len(pop) >= 5, p=p)
-    x = [pop[r[0]][i] + f * (pop[r[1]][i] - pop[r[2]][i]) + f * (
-                pop[r[3]][i] - pop[r[4]][i]) if rng.random() < cr or i == j else pop[ic][i] for i in
+    r1, r2, r3, r4, r5 = ic, ic, ic, ic, ic
+    while r1 != ic: r1 = rng.integers(len(pop))
+    while r2 != ic and r2 != r1: r2 = rng.integers(len(pop))
+    while r3 != ic and r3 != r2 and r3 != r1: r3 = rng.integers(len(pop))
+    while r4 != ic and r4 != r1 and r4 != r2 and r4 != r3: r4 = rng.integers(len(pop))
+    while r5 != ic and r5 != r1 and r5 != r2 and r5 != r3 and r5 != r4: r5 = rng.integers(len(pop))
+    x = [pop[r1][i] + f * (pop[r2][i] - pop[r3][i]) + f * (
+                pop[r4][i] - pop[r5][i]) if rng.random() < cr or i == j else pop[ic][i] for i in
          range(len(pop[ic]))]
     return np.asarray(x)
 
@@ -151,10 +157,13 @@ def cross_best2(pop, ic, f, cr, rng, x_b=None, **_kwargs):
 
     """
     j = rng.integers(len(pop[ic]))
-    p = [1 / (len(pop) - 1.0) if i != ic else 0 for i in range(len(pop))] if len(pop) > 4 else None
-    r = rng.choice(len(pop), 4, replace=not len(pop) >= 4, p=p)
-    x = [x_b[i] + f * (pop[r[0]][i] - pop[r[1]][i]) + f * (
-                pop[r[2]][i] - pop[r[3]][i]) if rng.random() < cr or i == j else pop[ic][i] for i in
+    r1, r2, r3, r4 = ic, ic, ic, ic
+    while r1 != ic: r1 = rng.integers(len(pop))
+    while r2 != ic and r2 != r1: r2 = rng.integers(len(pop))
+    while r3 != ic and r3 != r2 and r3 != r1: r3 = rng.integers(len(pop))
+    while r4 != ic and r4 != r1 and r4 != r2 and r4 != r3: r4 = rng.integers(len(pop))
+    x = [x_b[i] + f * (pop[r1][i] - pop[r2][i]) + f * (
+                pop[r3][i] - pop[r4][i]) if rng.random() < cr or i == j else pop[ic][i] for i in
          range(len(pop[ic]))]
     return np.asarray(x)
 
@@ -185,10 +194,13 @@ def cross_curr2rand1(pop, ic, f, cr, rng, **_kwargs):
 
     """
     j = rng.integers(len(pop[ic]))
-    p = [1 / (len(pop) - 1.0) if i != ic else 0 for i in range(len(pop))] if len(pop) > 4 else None
-    r = rng.choice(len(pop), 4, replace=not len(pop) >= 4, p=p)
-    x = [pop[ic][i] + f * (pop[r[0]][i] - pop[r[1]][i]) + f * (
-                pop[r[2]][i] - pop[r[3]][i]) if rng.random() < cr or i == j else pop[ic][i] for i in
+    r1, r2, r3, r4 = ic, ic, ic, ic
+    while r1 != ic: r1 = rng.integers(len(pop))
+    while r2 != ic and r2 != r1: r2 = rng.integers(len(pop))
+    while r3 != ic and r3 != r2 and r3 != r1: r3 = rng.integers(len(pop))
+    while r4 != ic and r4 != r1 and r4 != r2 and r4 != r3: r4 = rng.integers(len(pop))
+    x = [pop[ic][i] + f * (pop[r1][i] - pop[r2][i]) + f * (
+                pop[r3][i] - pop[r4][i]) if rng.random() < cr or i == j else pop[ic][i] for i in
          range(len(pop[ic]))]
     return np.asarray(x)
 
@@ -220,10 +232,12 @@ def cross_curr2best1(pop, ic, f, cr, rng, x_b=None, **_kwargs):
 
     """
     j = rng.integers(len(pop[ic]))
-    p = [1 / (len(pop) - 1.0) if i != ic else 0 for i in range(len(pop))] if len(pop) > 3 else None
-    r = rng.choice(len(pop), 3, replace=not len(pop) >= 3, p=p)
+    r1, r2, r3, r4 = ic, ic, ic, ic
+    while r1 != ic: r1 = rng.integers(len(pop))
+    while r2 != ic and r2 != r1: r2 = rng.integers(len(pop))
+    while r3 != ic and r3 != r2 and r3 != r1: r3 = rng.integers(len(pop))
     x = [
-        pop[ic][i] + f * (x_b[i] - pop[r[0]][i]) + f * (pop[r[1]][i] - pop[r[2]][i]) if rng.random() < cr or i == j else
+        pop[ic][i] + f * (x_b[i] - pop[r1][i]) + f * (pop[r2][i] - pop[r3][i]) if rng.random() < cr or i == j else
         pop[ic][i] for i in range(len(pop[ic]))]
     return np.asarray(x)
 
@@ -355,7 +369,7 @@ class DifferentialEvolution(OptimizationAlgorithm):
 
         """
         for i in range(len(population)):
-            xn = self.strategy(population, i, self.differential_weight, self.crossover_probability, self.rng, x_b=best_x)
+            xn = task.repair(self.strategy(population, i, self.differential_weight, self.crossover_probability, self.rng, x_b=best_x), rng=self.rng)
             fn = task.eval(xn)
             if fn < population_fitness[i]: 
                 population[i] = xn

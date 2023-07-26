@@ -440,6 +440,7 @@ class OptimizationAlgorithm(Algorithm):
             if threading.current_thread() == threading.main_thread() and multiprocessing.current_process().name == 'MainProcess':
                 raise e
             self.exception = e
+            print('ERROR: ', e)
             return None, None
 
 

@@ -15,8 +15,8 @@ from niapy.algorithms.analysis import (
     ExtendedDifferentialGrouping
 )
 from niapy.algorithms.basic import (
+    BareBonesFireworksAlgorithm,
     ParticleSwarmAlgorithm, 
-    DifferentialEvolution,
     SineCosineAlgorithm,
     FireflyAlgorithm,
     HarmonySearch,
@@ -89,6 +89,10 @@ def run_sca_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
     run_algo(SineCosineAlgorithm, no_fun, 1, population_size=NP)
 
 
+def run_bfwa_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
+    run_algo(BareBonesFireworksAlgorithm, no_fun, 1, population_size=NP)
+
+
 def run_rdg_cec2013(alpha:float=1e-12, NP:int=50, seed:int=1, no_fun:int=1)->None:
     algo = RecursiveDifferentialGrouping(seed=seed)
     for i in range(3):
@@ -134,4 +138,5 @@ if __name__ == "__main__":
     #run_test_func(no_fun=arg_no_fun)
     #run_rdg_cec2013(no_fun=arg_no_fun)
     #run_xdg_cec2013(no_fun=arg_no_fun)
-    run_sca_cec2013(no_fun=arg_no_fun)
+    run_bfwa_cec2013(no_fun=arg_no_fun)
+
