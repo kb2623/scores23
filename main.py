@@ -89,7 +89,7 @@ def run_sca_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
     run_algo(SineCosineAlgorithm, no_fun, 1, population_size=NP)
 
 
-def run_bfwa_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
+def run_bbfwa_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
     run_algo(BareBonesFireworksAlgorithm, no_fun, 1, population_size=NP)
 
 
@@ -138,5 +138,5 @@ if __name__ == "__main__":
     #run_test_func(no_fun=arg_no_fun)
     #run_rdg_cec2013(no_fun=arg_no_fun)
     #run_xdg_cec2013(no_fun=arg_no_fun)
-    run_bfwa_cec2013(no_fun=arg_no_fun)
+    run_bbfwa_cec2013(no_fun=arg_no_fun)
 
