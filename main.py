@@ -144,10 +144,14 @@ def run_cc_cec2013(no_fun:int) -> None:
     # create a test cec2013lsgo
     task = CEC2013lsgoTask(no_fun=no_fun)
     # start optimization of the task
+    start = timeit.default_timer()
     res = algo.run(task)
+    end = timeit.default_timer()
     # TODO save results
-    print(res)
-    
+    with open('%s.cc.cec2013lso.%d.csv' % (algo.toptimizer.Name[1], no_fun), 'a') as csvfile:
+        f1, f2, f3 = task.get_mesures()
+        csvfile.write('%d, %f, %f, %f, %f\n' % (seed + i, f1, f2, f3, stop - start))
+
 
 if __name__ == "__main__":
     arg_no_fun = int(sys.argv[1])
