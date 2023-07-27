@@ -1,4 +1,5 @@
 # encoding=utf8
+import sys
 from typing import Self, Tuple
 import logging
 
@@ -82,7 +83,7 @@ class CooperativeCoevolution(OptimizationAlgorithm):
         best_x = []
         for t in tasks:
             no_pop = self._get_pop_size(t.dimension)
-            a = self.toptimizer(population_size=no_pop)
+            a = self.toptimizer(population_size=no_pop, seed=self.integers(sys.maxsize))
             p, pf, d = a.init_population(t)
             algs.append(a)
             algs_params.append(d)

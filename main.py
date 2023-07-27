@@ -67,7 +67,7 @@ def run_algo(id:int, talgo:type, no_fun:int, *args:list, **kwargs:dict) -> None:
     stop = timeit.default_timer()
     with open('%s.cec2013lso.%d.csv' % (algo.Name[1], no_fun), 'a') as csvfile:
         f1, f2, f3 = task.get_mesures()
-        csvfile.write('%d, %f, %f, %f, %f\n' % (seed + i, f1, f2, f3, stop - start))
+        csvfile.write('%d, %f, %f, %f, %f\n' % (id, f1, f2, f3, stop - start))
 
 
 def run_algo_50(talgo:type, no_fun:int, seed:int, *args:list, **kwargs:dict) -> None:
@@ -138,26 +138,27 @@ def run_test_func(no_fun:int, max_evals:int = 3e6) -> None:
     print('Time of execution for f%d for %d evals = %fs' % (no_fun, max_evals, end - start))
 
 
-def run_cc_cec2013(no_fun:int) -> None:
-    #algo = CooperativeCoevolution(RecursiveDifferentialGrouping(), BareBonesFireworksAlgorithm)
-    algo = CooperativeCoevolution(RecursiveDifferentialGrouping(), SineCosineAlgorithm)
+def run_cc_cec2013(no_fun:int, seed:int) -> None:
+    algo = CooperativeCoevolution(RecursiveDifferentialGrouping(), BareBonesFireworksAlgorithm, seed=seed)
+    #algo = CooperativeCoevolution(RecursiveDifferentialGrouping(), SineCosineAlgorithm, seed=seed)
     # create a test cec2013lsgo
     task = CEC2013lsgoTask(no_fun=no_fun)
     # start optimization of the task
     start = timeit.default_timer()
     res = algo.run(task)
-    end = timeit.default_timer()
+    stop = timeit.default_timer()
     # TODO save results
     with open('%s.cc.cec2013lso.%d.csv' % (algo.toptimizer.Name[1], no_fun), 'a') as csvfile:
         f1, f2, f3 = task.get_mesures()
-        csvfile.write('%d, %f, %f, %f, %f\n' % (seed + i, f1, f2, f3, stop - start))
+        csvfile.write('%d, %f, %f, %f, %f\n' % (seed, f1, f2, f3, stop - start))
 
 
 if __name__ == "__main__":
     arg_no_fun = int(sys.argv[1])
+    arg_seed = int(sys.argv[2])
     #run_test_func(no_fun=arg_no_fun)
     #run_rdg_cec2013(no_fun=arg_no_fun)
     #run_xdg_cec2013(no_fun=arg_no_fun)
     #run_bbfwa_cec2013(no_fun=arg_no_fun)
-    run_cc_cec2013(arg_no_fun)
+    run_cc_cec2013(arg_no_fun, arg_seed)
 
