@@ -138,7 +138,7 @@ def run_test_func(no_fun:int, max_evals:int = 3e6) -> None:
     print('Time of execution for f%d for %d evals = %fs' % (no_fun, max_evals, end - start))
 
 
-def run_cc_cec2013(no_fun:int, seed:int) -> None:
+def run_cc_cec2013(no_fun:int, seed:int = 1) -> None:
     algo = CooperativeCoevolution(RecursiveDifferentialGrouping(), BareBonesFireworksAlgorithm, seed=seed)
     #algo = CooperativeCoevolution(RecursiveDifferentialGrouping(), SineCosineAlgorithm, seed=seed)
     # create a test cec2013lsgo
@@ -154,8 +154,8 @@ def run_cc_cec2013(no_fun:int, seed:int) -> None:
 
 
 if __name__ == "__main__":
-    arg_no_fun = int(sys.argv[1])
-    arg_seed = int(sys.argv[2])
+    arg_no_fun = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+    arg_seed = int(sys.argv[2]) if len(sys.argv) > 2 else 1
     #run_test_func(no_fun=arg_no_fun)
     #run_rdg_cec2013(no_fun=arg_no_fun)
     #run_xdg_cec2013(no_fun=arg_no_fun)
