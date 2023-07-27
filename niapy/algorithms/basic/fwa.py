@@ -145,18 +145,18 @@ class BareBonesFireworksAlgorithm(OptimizationAlgorithm):
 
         """
         amplitude = params.pop('amplitude')
-
-        sparks = self.uniform(population - amplitude, population + amplitude, (self.num_sparks, task.dimension))
+        x, xf = population[0], population_fitness[0]
+        sparks = self.uniform(x - amplitude, x + amplitude, (self.num_sparks, task.dimension))
         sparks = np.apply_along_axis(task.repair, 1, sparks, self.rng)
         sparks_fitness = np.apply_along_axis(task.eval, 1, sparks)
         best_index = np.argmin(sparks_fitness)
-        if sparks_fitness[best_index] < population_fitness:
-            population = sparks[best_index]
-            population_fitness = sparks_fitness[best_index]
+        if sparks_fitness[best_index] < xf:
+            x = sparks[best_index]
+            xf = sparks_fitness[best_index]
             amplitude = self.amplification_coefficient * amplitude
         else:
             amplitude = self.reduction_coefficient * amplitude
-        return population, population_fitness, population.copy(), population_fitness, {'amplitude': amplitude}
+        return [x], [xf], x.copy(), xf, {'amplitude': amplitude}
 
 
 class FireworksAlgorithm(OptimizationAlgorithm):

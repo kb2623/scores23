@@ -23,9 +23,11 @@ from niapy.algorithms.basic import (
     BatAlgorithm
 )
 
+from ccalgorithm import CooperativeCoevolution
+
 
 class CEC2013lsgoTask(Task):
-    def __init__(self, no_fun:int, *args:list, **kwargs:dict)->None:
+    def __init__(self, no_fun:int, *args:list, **kwargs:dict) -> None:
         if 1 < no_fun > 15: raise Exception('Function between 1 and 15!!!')
         bench = Benchmark()
         info = bench.get_info(no_fun)
@@ -33,7 +35,7 @@ class CEC2013lsgoTask(Task):
         fun_fitness = bench.get_function(no_fun)
         
         class CEC2013lsgoProblem(Problem):
-            def __init__(self, *args:list, **kwargs:dict):
+            def __init__(self, *args:list, **kwargs:dict) -> None:
                 kwargs.pop('dimension', None), kwargs.pop('lower', None), kwargs.pop('upper', None)
                 super().__init__(dimension=info['dimension'], lower=info['lower'], upper=info['upper'], *args, **kwargs)
         
@@ -43,7 +45,7 @@ class CEC2013lsgoTask(Task):
         kwargs.pop('problem', None), kwargs.pop('optimization_type', None), kwargs.pop('lower', None), kwargs.pop('upper', None), kwargs.pop('dimension', None), kwargs.pop('max_evals', None)
         super().__init__(problem=CEC2013lsgoProblem(), max_evals=max_evals, *args, **kwargs)
 
-    def get_mesures(self):
+    def get_mesures(self) -> list[float]:
         r = [self.fitness_evals[0][1], self.fitness_evals[0][1], self.fitness_evals[0][1]]
         for e in self.fitness_evals:
             if e[0] > 120000: break
@@ -57,43 +59,46 @@ class CEC2013lsgoTask(Task):
         return r
 
 
-def run_algo(talgo:type, no_fun:int, seed:int, *args:list, **kwargs:dict)->None:
-    for i in range(50):
-        algo = talgo(seed=seed + i, **kwargs)
-        task = CEC2013lsgoTask(no_fun=no_fun)
-        start = timeit.default_timer()
-        best = algo.run(task)
-        stop = timeit.default_timer()
-        with open('%s.cec2013lso.%d.csv' % (algo.Name[1], no_fun), 'a') as csvfile:
-            f1, f2, f3 = task.get_mesures()
-            csvfile.write('%d, %f, %f, %f, %f\n' % (seed + i, f1, f2, f3, stop - start))
+def run_algo(id:int, talgo:type, no_fun:int, *args:list, **kwargs:dict) -> None:
+    algo = talgo(seed=id, **kwargs)
+    task = CEC2013lsgoTask(no_fun=no_fun)
+    start = timeit.default_timer()
+    best = algo.run(task)
+    stop = timeit.default_timer()
+    with open('%s.cec2013lso.%d.csv' % (algo.Name[1], no_fun), 'a') as csvfile:
+        f1, f2, f3 = task.get_mesures()
+        csvfile.write('%d, %f, %f, %f, %f\n' % (seed + i, f1, f2, f3, stop - start))
 
 
-def run_fa_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
-    run_algo(FireflyAlgorithm, no_fun, 1, population_size=NP)
+def run_algo_50(talgo:type, no_fun:int, seed:int, *args:list, **kwargs:dict) -> None:
+    for i in range(50): run_algo(seed + i, talgo, no_fun)
+        
+
+def run_fa_cec2013(NP:int = 100, seed:int = 1, no_fun:int = 1) -> None:
+    run_algo_50(FireflyAlgorithm, no_fun, 1, population_size=NP)
 
 
-def run_hs_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
-    run_algo(HarmonySearch, no_fun, 1, population_size=NP)
+def run_hs_cec2013(NP:int = 100, seed:int = 1, no_fun:int = 1) -> None:
+    run_algo_50(HarmonySearch, no_fun, 1, population_size=NP)
 
 
-def run_ba_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
-    run_algo(BatAlgorithm, no_fun, 1, population_size=NP)
+def run_ba_cec2013(NP:int = 100, seed:int = 1, no_fun:int = 1) -> None:
+    run_algo_50(BatAlgorithm, no_fun, 1, population_size=NP)
 
 
-def run_pso_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
-    run_algo(ParticleSwarmAlgorithm, no_fun, 1, population_size=NP)
+def run_pso_cec2013(NP:int = 100, seed:int = 1, no_fun:int = 1) -> None:
+    run_algo_50(ParticleSwarmAlgorithm, no_fun, 1, population_size=NP)
 
 
-def run_sca_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
-    run_algo(SineCosineAlgorithm, no_fun, 1, population_size=NP)
+def run_sca_cec2013(NP:int = 100, seed:int = 1, no_fun:int = 1) -> None:
+    run_algo_50(SineCosineAlgorithm, no_fun, 1, population_size=NP)
 
 
-def run_bbfwa_cec2013(NP:int=100, seed:int=1, no_fun:int=1)->None:
-    run_algo(BareBonesFireworksAlgorithm, no_fun, 1, population_size=NP)
+def run_bbfwa_cec2013(NP:int = 100, seed:int = 1, no_fun:int = 1) -> None:
+    run_algo_50(BareBonesFireworksAlgorithm, no_fun, 1, population_size=NP)
 
 
-def run_rdg_cec2013(alpha:float=1e-12, NP:int=50, seed:int=1, no_fun:int=1)->None:
+def run_rdg_cec2013(alpha:float = 1e-12, NP:int = 50, seed:int = 1, no_fun:int = 1) -> None:
     algo = RecursiveDifferentialGrouping(seed=seed)
     for i in range(3):
         task = CEC2013lsgoTask(no_fun=no_fun)
@@ -103,7 +108,7 @@ def run_rdg_cec2013(alpha:float=1e-12, NP:int=50, seed:int=1, no_fun:int=1)->Non
         print(algo.Name[-1], ': ', algo.get_parameters())
 
 
-def run_xdg_cec2013(alpha:float=1e-12, NP:int=50, seed:int=1, no_fun:int=1)->None:
+def run_xdg_cec2013(alpha:float = 1e-12, NP:int = 50, seed:int = 1, no_fun:int = 1) -> None:
     algo = ExtendedDifferentialGrouping(seed=seed)
     for i in range(3):
         task = CEC2013lsgoTask(no_fun=no_fun)
@@ -118,7 +123,7 @@ def run_xdg_cec2013(alpha:float=1e-12, NP:int=50, seed:int=1, no_fun:int=1)->Non
         print(algo.Name[-1], ': ', algo.get_parameters())
 
 
-def run_test_func(no_fun:int, max_evals:int=3e6)->None:
+def run_test_func(no_fun:int, max_evals:int = 3e6) -> None:
     if 1 < no_fun > 15: raise Exception('Function between 1 and 15!!!')
     bench = Benchmark()
     info = bench.get_info(no_fun)
@@ -133,10 +138,22 @@ def run_test_func(no_fun:int, max_evals:int=3e6)->None:
     print('Time of execution for f%d for %d evals = %fs' % (no_fun, max_evals, end - start))
 
 
+def run_cc_cec2013(no_fun:int) -> None:
+    #algo = CooperativeCoevolution(RecursiveDifferentialGrouping(), BareBonesFireworksAlgorithm)
+    algo = CooperativeCoevolution(RecursiveDifferentialGrouping(), SineCosineAlgorithm)
+    # create a test cec2013lsgo
+    task = CEC2013lsgoTask(no_fun=no_fun)
+    # start optimization of the task
+    res = algo.run(task)
+    # TODO save results
+    print(res)
+    
+
 if __name__ == "__main__":
     arg_no_fun = int(sys.argv[1])
     #run_test_func(no_fun=arg_no_fun)
     #run_rdg_cec2013(no_fun=arg_no_fun)
     #run_xdg_cec2013(no_fun=arg_no_fun)
-    run_bbfwa_cec2013(no_fun=arg_no_fun)
+    #run_bbfwa_cec2013(no_fun=arg_no_fun)
+    run_cc_cec2013(arg_no_fun)
 
