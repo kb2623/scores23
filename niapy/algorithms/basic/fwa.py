@@ -123,7 +123,7 @@ class BareBonesFireworksAlgorithm(OptimizationAlgorithm):
         d.update({'amplitude': task.range})
         return x, x_fit, d
 
-    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, **params):
+    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, *args, **params):
         r"""Core function of Bare Bones Fireworks Algorithm.
 
         Args:
@@ -132,7 +132,8 @@ class BareBonesFireworksAlgorithm(OptimizationAlgorithm):
             population_fitness (float): Current solution fitness/function value.
             best_x (numpy.ndarray): Current best solution.
             best_fitness (float): Current best solution fitness/function value.
-            params (Dict[str, Any]): Additional parameters.
+            args (list): Additional parameters.
+            params (dict[str, any]): Additional parameters.
 
         Returns:
             Tuple[numpy.ndarray, float, numpy.ndarray, float, Dict[str, Any]]:
@@ -373,7 +374,7 @@ class FireworksAlgorithm(OptimizationAlgorithm):
         population_fitness[1:] = fitness[selected_indices]
         return population, population_fitness, best_x, best_fitness
 
-    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, **params):
+    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, *args, **params):
         r"""Core function of Fireworks algorithm.
 
         Args:
@@ -761,7 +762,7 @@ class DynamicFireworksAlgorithmGauss(EnhancedFireworksAlgorithm):
         population[0], population_fitness[0] = sparks[ib], sparks_fitness[ib]
         return population, population_fitness
 
-    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, **params):
+    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, *args, **params):
         r"""Core function of DynamicFireworksAlgorithmGauss algorithm.
 
         Args:
@@ -870,7 +871,7 @@ class DynamicFireworksAlgorithm(DynamicFireworksAlgorithmGauss):
         """
         return r"""S. Zheng, A. Janecek, J. Li and Y. Tan, "Dynamic search in fireworks algorithm," 2014 IEEE Congress on Evolutionary Computation (CEC), Beijing, 2014, pp. 3222-3229. doi: 10.1109/CEC.2014.6900485"""
 
-    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, **params):
+    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, *args, **params):
         r"""Co50re function of Dynamic Fireworks Algorithm.
 
         Args:

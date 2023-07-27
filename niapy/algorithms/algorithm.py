@@ -339,7 +339,7 @@ class OptimizationAlgorithm(Algorithm):
                                                  individual_type=self.individual_type)
         return pop, fpop, {}
 
-    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, **params):
+    def run_iteration(self, task, population, population_fitness, best_x, best_fitness, iters, *args, **params):
         r"""Core functionality of algorithm.
 
         This function is called on every algorithm iteration.
@@ -350,7 +350,9 @@ class OptimizationAlgorithm(Algorithm):
             population_fitness (numpy.ndarray): Current population fitness value.
             best_x (numpy.ndarray): Current generation best individuals coordinates.
             best_fitness (float): current generation best individuals fitness value.
-            **params (Dict[str, Any]): Additional arguments for algorithms.
+            iters (int): Algorithm iteration number.
+            *args (list): Additional arguments.
+            **params (dict[str, any]): Additional arguments for algorithms.
 
         Returns:
             Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, float, Dict[str, Any]]:
@@ -391,7 +393,7 @@ class OptimizationAlgorithm(Algorithm):
         if task.stopping_condition():
             yield xb, fxb
         while True:
-            pop, fpop, xb, fxb, params = self.run_iteration(task, pop, fpop, xb, fxb, iters=iters, **params)
+            pop, fpop, xb, fxb, params = self.run_iteration(task, pop, fpop, xb, fxb, iters, **params)
             iters += 1
             yield xb, fxb
 

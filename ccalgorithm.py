@@ -117,7 +117,7 @@ class CooperativeCoevolution(OptimizationAlgorithm):
             iters += 1
             yield xb, fxb
 
-    def run_iteration(self:Self, task:Task, population:np.ndarray, population_fitness:np.ndarray, best_x:np.ndarray, best_fitness:np.ndarray, bests_x:list[np.ndarray], bests_fitness:list[float], iters:int, tasks:list[Task], algs:list[OptimizationAlgorithm], algs_params:list[dict[str, any]], groups:list[list[int]], seps:list[int], **params:dict[str, any]) -> Tuple[np.ndarray, np.ndarray, np.ndarray, float, dict[str, any]]:
+    def run_iteration(self:Self, task:Task, population:np.ndarray, population_fitness:np.ndarray, best_x:np.ndarray, best_fitness:np.ndarray, bests_x:list[np.ndarray], bests_fitness:list[float], iters:int, tasks:list[Task], algs:list[OptimizationAlgorithm], algs_params:list[dict[str, any]], groups:list[list[int]], seps:list[int], *args, **params:dict[str, any]) -> Tuple[np.ndarray, np.ndarray, np.ndarray, float, dict[str, any]]:
         for i, t in enumerate(tasks):
             population[i], population_fitness[i], bests_x[i], bests_fitness[i], algs_params[i] = algs[i].run_iteration(t, population[i], population_fitness[i], bests_x[i], bests_fitness[i], iters, **algs_params[i])
             if bests_fitness[i] < best_fitness:
