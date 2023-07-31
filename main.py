@@ -98,29 +98,43 @@ def run_bbfwa_cec2013(NP:int = 100, seed:int = 1, no_fun:int = 1) -> None:
     run_algo_50(BareBonesFireworksAlgorithm, no_fun, 1, population_size=NP)
 
 
+def no_seps(a:list) -> int:
+    s = 0
+    for e in a:
+        if len(e) > 1: continue
+        s += 1
+    return s
+
+
+def no_groups(a:list) -> int:
+    s = 0
+    for e in a:
+        if len(e) == 1: continue
+        s += 1
+    return s
+
+
 def run_rdg_cec2013(alpha:float = 1e-12, NP:int = 50, seed:int = 1, no_fun:int = 1) -> None:
-    algo = RecursiveDifferentialGrouping(seed=seed)
-    for i in range(3):
-        task = CEC2013lsgoTask(no_fun=no_fun)
-        algo.set_parameters(n=NP, alpha=alpha)
-        best = algo.run(task=task)
-        print('groups: %s\nno. groups: %s\tno. evals: %d' % (best, len(best), task.evals))
-        print(algo.Name[-1], ': ', algo.get_parameters())
+    algo = RecursiveDifferentialGroupingV3(seed=seed)
+    task = CEC2013lsgoTask(no_fun=no_fun)
+    algo.set_parameters(n=NP, alpha=alpha)
+    best = algo.run(task=task)
+    print('groups: %s\nno. groups: %d\tno. seps: %d\nno. evals: %d' % (best, no_groups(best), no_seps(best), task.evals))
+    print(algo.Name[-1], ': ', algo.get_parameters())
 
 
 def run_xdg_cec2013(alpha:float = 1e-12, NP:int = 50, seed:int = 1, no_fun:int = 1) -> None:
     algo = ExtendedDifferentialGrouping(seed=seed)
-    for i in range(3):
-        task = CEC2013lsgoTask(no_fun=no_fun)
-        # Get better mesurement for epsilon
-        X = algo.rng.uniform(task.lower, task.upper, (NP, task.dimension))
-        Xf = np.apply_along_axis(task.eval, 1, X)
-        epsilon = alpha * np.min(Xf)
-        # Set new epsilon
-        algo.set_parameters(epsilon=epsilon)
-        best = algo.run(task=task)
-        print('groups: %s\nno. groups: %s\tno. evals: %d' % (best, len(best), task.evals))
-        print(algo.Name[-1], ': ', algo.get_parameters())
+    task = CEC2013lsgoTask(no_fun=no_fun)
+    # Get better mesurement for epsilon
+    X = algo.rng.uniform(task.lower, task.upper, (NP, task.dimension))
+    Xf = np.apply_along_axis(task.eval, 1, X)
+    epsilon = alpha * np.min(Xf)
+    # Set new epsilon
+    algo.set_parameters(epsilon=epsilon)
+    best = algo.run(task=task)
+    print('groups: %s\nno. groups: %s\nno. seps: %s\tno. evals: %d' % (best, no_groups(best), no_seps(best), task.evals))
+    print(algo.Name[-1], ': ', algo.get_parameters())
 
 
 def run_test_func(no_fun:int, max_evals:int = 3e6) -> None:
