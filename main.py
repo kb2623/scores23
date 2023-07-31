@@ -11,7 +11,7 @@ from niapy.task import Task
 from niapy.problems import Problem
 
 from niapy.algorithms.analysis import (
-    RecursiveDifferentialGrouping, 
+    RecursiveDifferentialGroupingV3,
     ExtendedDifferentialGrouping
 )
 from niapy.algorithms.basic import (
@@ -139,8 +139,8 @@ def run_test_func(no_fun:int, max_evals:int = 3e6) -> None:
 
 
 def run_cc_cec2013(no_fun:int, seed:int = 1) -> None:
-    algo = CooperativeCoevolution(RecursiveDifferentialGrouping(), BareBonesFireworksAlgorithm, seed=seed)
-    #algo = CooperativeCoevolution(RecursiveDifferentialGrouping(), SineCosineAlgorithm, seed=seed)
+    algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(), BareBonesFireworksAlgorithm, seed=seed)
+    #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(), SineCosineAlgorithm, seed=seed)
     # create a test cec2013lsgo
     task = CEC2013lsgoTask(no_fun=no_fun)
     # start optimization of the task
@@ -148,7 +148,7 @@ def run_cc_cec2013(no_fun:int, seed:int = 1) -> None:
     res = algo.run(task)
     stop = timeit.default_timer()
     # TODO save results
-    with open('%s.cc.cec2013lso.%d.csv' % (algo.toptimizer.Name[1], no_fun), 'a') as csvfile:
+    with open('%s.%s.cec2013lso.%d.csv' % (algo.decompozer.Name[1], algo.toptimizer.Name[1], no_fun), 'a') as csvfile:
         f1, f2, f3 = task.get_mesures()
         csvfile.write('%d, %f, %f, %f, %f\n' % (seed, f1, f2, f3, stop - start))
 
