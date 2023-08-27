@@ -52,6 +52,7 @@ class Task:
         max_evals (int): Maximum number of function evaluations.
         cutoff_value (float): Reference function/fitness values to reach in optimization.
         x_f (float): Best found individual function/fitness value.
+        x (numpy.ndarray): Best individual found.
 
     """
 
@@ -95,6 +96,7 @@ class Task:
 
         self.cutoff_value = -np.inf * optimization_type.value if cutoff_value is None else cutoff_value
         self.x_f = np.inf * optimization_type.value
+        self.x = self.lower
         self.max_evals = max_evals
         self.fitness_evals = []  # fitness improvements at self.n_evals evaluations
 
@@ -134,8 +136,9 @@ class Task:
         self.evals += 1
         x_f = self.problem.evaluate(x) * self.optimization_type.value
 
-        if x_f < self.x_f * self.optimization_type.value:
-            self.x_f = x_f * self.optimization_type.value
+        if x_f < self.x_f:
+            self.x_f = x_f
+            self.x = np.copy(x)
             self.fitness_evals.append((self.evals, x_f))
         return x_f
 
@@ -159,4 +162,22 @@ class Task:
 
         """
         return (self.evals >= self.max_evals) or (self.cutoff_value * self.optimization_type.value >= self.x_f * self.optimization_type.value)
+
+    def get_best_fitness(self):
+        r"""Get best individual fitness value.
+
+        Returns:
+            float: Best fitness value.
+
+        """
+        return self.x_f * self.optimization_type.value
+
+    def get_best(self):
+        r"""Get betst individual position.
+
+        Returns:
+            number.ndarray: Position of best individual.
+
+        """
+        return self.x
 
