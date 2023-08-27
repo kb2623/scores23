@@ -153,14 +153,17 @@ def run_test_func(no_fun:int, max_evals:int = 3e6) -> None:
 
 
 def run_cc_cec2013(no_fun:int, seed:int = 1) -> None:
-    algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(), BareBonesFireworksAlgorithm, seed=seed)
-    #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(), SineCosineAlgorithm, seed=seed)
+    algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(), BareBonesFireworksAlgorithm, population_size=65, seed=seed)
+    algo.set_optimizer_parameters(num_sparks=90, amplification_coefficient=1.25, reduction_coefficient=0.34)
+    #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(), SineCosineAlgorithm, population_size=150, seed=seed)
     # create a test cec2013lsgo
     task = CEC2013lsgoTask(no_fun=no_fun)
     # start optimization of the task
     start = timeit.default_timer()
     res = algo.run(task)
     stop = timeit.default_timer()
+    print('res: ', res)
+    print('test: %s -> %f' % (task.x, task.x_f))
     # TODO save results
     with open('%s.%s.cec2013lso.%d.csv' % (algo.decompozer.Name[1], algo.toptimizer.Name[1], no_fun), 'a') as csvfile:
         f1, f2, f3 = task.get_mesures()

@@ -79,7 +79,7 @@ class CooperativeCoevolution(OptimizationAlgorithm):
 
     def _get_pop_size(self:Self, no_elems:int) -> int:
         r = no_elems * 10
-        return r if r < 120 else 120
+        return r if r < self.population_size else population_size
 
     def init_population(self:Self, task:Task) -> Tuple[np.ndarray, np.ndarray, dict[str, any]]:
         # get groups
