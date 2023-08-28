@@ -154,7 +154,7 @@ def run_test_func(no_fun:int, max_evals:int = 3e6) -> None:
 
 def run_cc_cec2013(no_fun:int, seed:int = 1) -> None:
     algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(), BareBonesFireworksAlgorithm, population_size=65, seed=seed)
-    algo.set_optimizer_parameters(num_sparks=90, amplification_coefficient=1.25, reduction_coefficient=0.34)
+    algo.set_optimizer_parameters(num_sparks=10, amplification_coefficient=1.75, reduction_coefficient=0.75)
     #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(), SineCosineAlgorithm, population_size=150, seed=seed)
     # create a test cec2013lsgo
     task = CEC2013lsgoTask(no_fun=no_fun)
@@ -177,5 +177,6 @@ if __name__ == "__main__":
     #run_rdg_cec2013(no_fun=arg_no_fun)
     #run_xdg_cec2013(no_fun=arg_no_fun)
     #run_bbfwa_cec2013(no_fun=arg_no_fun)
-    run_cc_cec2013(arg_no_fun, arg_seed)
+    for i in range(50):
+        run_cc_cec2013(arg_no_fun, i)
 
