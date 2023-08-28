@@ -173,6 +173,7 @@ def run_cc_cec2013(no_fun:int, seed:int = 1) -> None:
 if __name__ == "__main__":
     arg_no_fun = int(sys.argv[1]) if len(sys.argv) > 1 else 1
     arg_seed = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+    np.set_printoptions(linewidth=np.inf)
     #run_test_func(no_fun=arg_no_fun)
     #run_rdg_cec2013(no_fun=arg_no_fun)
     #run_xdg_cec2013(no_fun=arg_no_fun)
