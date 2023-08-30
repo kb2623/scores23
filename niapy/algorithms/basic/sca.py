@@ -72,10 +72,7 @@ class SineCosineAlgorithm(OptimizationAlgorithm):
             * :func:`niapy.algorithms.algorithm.Algorithm.__init__`
 
         """
-        super().__init__(population_size, *args, **kwargs)
-        self.a = a
-        self.r_min = r_min
-        self.r_max = r_max
+        super().__init__(*args, **kwargs)
 
     def set_parameters(self, population_size=25, a=3, r_min=0, r_max=2, **kwargs):
         r"""Set the arguments of an algorithm.
@@ -91,6 +88,7 @@ class SineCosineAlgorithm(OptimizationAlgorithm):
 
         """
         super().set_parameters(population_size=population_size, **kwargs)
+        self.population_size = population_size
         self.a = a
         self.r_min = r_min
         self.r_max = r_max
