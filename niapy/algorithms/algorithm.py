@@ -16,19 +16,22 @@ __all__ = [
     'Algorithm',
     'AnalysisAlgorithm',
     'OptimizationAlgorithm',
+    'CoEvolutionOptimizationAlgorithm',
     'Individual',
     'default_individual_init',
     'default_numpy_init'
 ]
 
 
-def default_numpy_init(task, population_size, rng, **_kwargs):
+def default_numpy_init(task, population_size, rng, *args, **kwargs):
     r"""Initialize starting population that is represented with `numpy.ndarray` with shape `(population_size, task.dimension)`.
 
     Args:
         task (Task): Optimization task.
         population_size (int): Number of individuals in population.
         rng (numpy.random.Generator): Random number generator.
+        *args (list): Additional list arguments.
+        **kwargs (dict[str, any]): Additional keyword arguments.
 
     Returns:
         Tuple[numpy.ndarray, numpy.ndarray[float]]:
@@ -92,7 +95,7 @@ class Algorithm:
             * :func:`niapy.algorithms.Algorithm.set_parameters`
 
         """
-        self.individual_type = individual_type
+        self.set_parameters(individual_type=individual_type, *args, **kwargs)
         self.rng = default_rng(seed)
         self.exception = None
 
@@ -101,6 +104,8 @@ class Algorithm:
 
         Args:
             individual_type (Optional[Type[Individual]]): Individual type used in population, default is Numpy array.
+            args (list): Additional list parameters.
+            kwargs (dict[str, any]): Additional dictionary parameters.
 
         See Also:
             * :func:`niapy.algorithms.default_numpy_init`
@@ -121,6 +126,16 @@ class Algorithm:
         return {
             'individual_type': self.individual_type
         }
+
+    @staticmethod
+    def info():
+        r"""Get algorithm information.
+
+        Returns:
+            str: Bit item.
+
+        """
+        return '''Basic algorithm. No implementation!!!'''
 
     def random(self, size=None):
         r"""Get random distribution of shape size in range from 0 to 1.
@@ -200,16 +215,6 @@ class Algorithm:
         """
         return self.exception is not None
 
-    @staticmethod
-    def info():
-        r"""Get algorithm information.
-
-        Returns:
-            str: Bit item.
-
-        """
-        return '''Basic algorithm. No implementation!!!'''
-
     def run(self, task, *args, **kwargs):
         r"""Start the algorithm run.
 
@@ -223,7 +228,7 @@ class Algorithm:
 
 
 class OptimizationAlgorithm(Algorithm):
-    r"""lass for implementing optimization algorithms.
+    r"""Class for implementing optimization algorithms.
 
     Date:
         2022
@@ -244,7 +249,7 @@ class OptimizationAlgorithm(Algorithm):
 
     """
 
-    def __init__(self, population_size=50, initialization_function=default_numpy_init, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         r"""Initialize algorithm and create name for an algorithm.
 
         Args:
@@ -257,16 +262,13 @@ class OptimizationAlgorithm(Algorithm):
 
         """
         super().__init__(*args, **kwargs)
-        self.population_size = population_size
-        self.initialization_function = initialization_function
 
-    def set_parameters(self, population_size=50, initialization_function=default_numpy_init, *args, **kwargs):
+    def set_parameters(self, initialization_function=default_numpy_init, *args, **kwargs):
         r"""Set the parameters/arguments of the algorithm.
 
         Args:
             population_size (Optional[int]): Population size.
-            initialization_function (Optional[Callable[[int, Task, numpy.random.Generator, Dict[str, Any]], Tuple[numpy.ndarray, numpy.ndarray[float]]]]):
-                Population initialization function.
+            initialization_function (Optional[Callable[[int, Task, numpy.random.Generator, Dict[str, Any]], Tuple[numpy.ndarray, numpy.ndarray[float]]]]): Population initialization function.
 
         See Also:
             * :func:`niapy.algorithms.default_numpy_init`
@@ -274,7 +276,6 @@ class OptimizationAlgorithm(Algorithm):
 
         """
         super().set_parameters(*args, **kwargs)
-        self.population_size = population_size
         self.initialization_function = initialization_function
 
     def get_parameters(self):
@@ -291,7 +292,6 @@ class OptimizationAlgorithm(Algorithm):
         """
         d = super().get_parameters()
         d.update({
-            'population_size': self.population_size,
             'initialization_function': self.initialization_function,
         })
         return d
@@ -335,8 +335,7 @@ class OptimizationAlgorithm(Algorithm):
             * :func:`niapy.algorithms.Algorithm.set_parameters`
 
         """
-        pop, fpop = self.initialization_function(task=task, population_size=self.population_size, rng=self.rng,
-                                                 individual_type=self.individual_type)
+        pop, fpop = self.initialization_function(task=task, population_size=self.population_size, rng=self.rng, individual_type=self.individual_type)
         return pop, fpop, {}
 
     def run_iteration(self, task, population, population_fitness, best_x, best_fitness, iters, *args, **params):
@@ -387,13 +386,13 @@ class OptimizationAlgorithm(Algorithm):
             * :func:`niapy.algorithms.OptimizationAlgorithm.run_iteration`
 
         """
-        iters = 0
         pop, fpop, params = self.init_population(task)
+        iters = 1
         xb, fxb = self.get_best(pop, fpop)
         if task.stopping_condition():
             yield xb, fxb
         while True:
-            pop, fpop, xb, fxb, params = self.run_iteration(task, pop, fpop, xb, fxb, iters, **params)
+            pop, fpop, xb, fxb, params = self.run_iteration(task=task, population=pop, population_fitness=fpop, best_x=xb, best_fitness=fxb, iters=iters, **params)
             iters += 1
             yield xb, fxb
 
@@ -445,11 +444,11 @@ class OptimizationAlgorithm(Algorithm):
             return None, None
 
 
-class AnalysisAlgorithm(Algorithm):
-    r"""lass for implementing analysis algorithms.
+class CoEvolutionOptimizationAlgorithm(OptimizationAlgorithm):
+    r"""Class for implementing optimization algorithms.
 
     Date:
-        2022
+        2023
 
     Author
         Klemen Berkovič
@@ -457,13 +456,132 @@ class AnalysisAlgorithm(Algorithm):
     License:
         MIT
 
-    Attributes:
-        Name (List[str]): List of names for algorithm.
-        rng (numpy.random.Generator): Random generator.
-        population_size (int): Population size.
-        initialization_function (Callable[[int, Task, numpy.random.Generator, Dict[str, Any]], Tuple[numpy.ndarray, numpy.ndarray[float]]]):
-            Population initialization function.
-        individual_type (Optional[Type[Individual]]): Type of individuals used in population, default value is None for Numpy arrays.
+    See Also:
+        * :class:`niapy.algorithms.OptimizationAlgorithm`
+
+    """
+
+    def run_iteration(self, task, groups, population, population_fitness, best_x, best_fitness, iters, *args, **params):
+        r"""Core functionality of algorithm.
+
+        This function is called on every algorithm iteration.
+
+        Args:
+            task (Task): Optimization task.
+            groups (Union[list[int], set[int], numpy.ndarray])
+            population (numpy.ndarray): Current population coordinates.
+            population_fitness (numpy.ndarray): Current population fitness value.
+            best_x (numpy.ndarray): Current generation best individuals coordinates.
+            best_fitness (float): current generation best individuals fitness value.
+            iters (int): Algorithm iteration number.
+            *args (list): Additional arguments.
+            **params (dict[str, any]): Additional arguments for algorithms.
+
+        Returns:
+            Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, float, Dict[str, Any]]:
+                1. New populations coordinates.
+                2. New populations fitness values.
+                3. New global best position/solution
+                4. New global best fitness/objective value
+                5. Additional arguments of the algorithm.
+
+        See Also:
+            * :func:`niapy.algorithms.OptimizationAlgorithm.iteration_generator`
+
+        """
+        return population, population_fitness, best_x, best_fitness, params
+
+    def iteration_generator(self, task, groups):
+        r"""Run the algorithm for a single iteration and return the best solution.
+
+        Args:
+            task (Task): Task with bounds and objective function for optimization.
+            groups (Union[list[int], set[int], numpy.ndarray])
+
+        Returns:
+            Generator[Tuple[numpy.ndarray, float], None, None]: Generator getting new/old optimal global values.
+
+        Yields:
+            Tuple[numpy.ndarray, float]:
+                1. New population best individuals coordinates.
+                2. Fitness value of the best solution.
+
+        See Also:
+            * :func:`niapy.algorithms.OptimizationAlgorithm.init_population`
+            * :func:`niapy.algorithms.OptimizationAlgorithm.run_iteration`
+
+        """
+        pop, fpop, params = self.init_population(task)
+        iters = 1
+        xb, fxb = self.get_best(pop, fpop)
+        if task.stopping_condition():
+            yield xb, fxb
+        while True:
+            pop, fpop, xb, fxb, params = self.run_iteration(task=task, groups=groups, population=pop, population_fitness=fpop, best_x=xb, best_fitness=fxb, iters=iters, **params)
+            iters += 1
+            yield xb, fxb
+
+    def run_task(self, task, groups):
+        r"""Start the optimization.
+
+        Args:
+            task (Task): Task with bounds and objective function for optimization.
+            groups (Union[list[int], set[int], numpy.ndarray])
+
+        Returns:
+            Tuple[numpy.ndarray, float]:
+                1. Best individuals components found in optimization process.
+                2. Best fitness value found in optimization process.
+
+        See Also:
+            * :func:`niapy.algorithms.OptimizationAlgorithm.iteration_generator`
+
+        """
+        algo, xb, fxb = self.iteration_generator(task, groups), None, np.inf
+        while not task.stopping_condition():
+            xb, fxb = next(algo)
+        return xb, fxb
+
+    def run(self, task, groups, *args, **kwargs):
+        r"""Start the optimization.
+
+        Args:
+            task (Task): Optimization task.
+            groups (Union[list[int], set[int], numpy.ndarray])
+            args (list): Additional list parameters.
+            kwargs (dict): Additional keyword parametes.
+
+        Returns:
+            Tuple[numpy.ndarray, float]:
+                1. Best individuals components found in optimization process.
+                2. Best fitness value found in optimization process.
+
+        See Also:
+            * :func:`niapy.algorithms.Algorithm.run`
+            * :func:`niapy.algorithms.OptimizationAlgorithm.run_task`
+
+        """
+        try:
+            r = self.run_task(task)
+            return r[0], r[1] * task.optimization_type.value
+        except BaseException as e:
+            if threading.current_thread() == threading.main_thread() and multiprocessing.current_process().name == 'MainProcess':
+                raise e
+            self.exception = e
+            return None, None
+
+
+class AnalysisAlgorithm(Algorithm):
+    r"""lass for implementing analysis algorithms.
+
+    Date:
+        2023
+
+    Author
+        Klemen Berkovič
+
+    License:
+        MIT
 
     See Also:
         * :class:`niapy.algorithms.Algorithm`

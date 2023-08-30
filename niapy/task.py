@@ -56,9 +56,7 @@ class Task:
 
     """
 
-    def __init__(self, problem=None, dimension=None, lower=None, upper=None,
-                 optimization_type=OptimizationType.MINIMIZATION, repair_function=limit, max_evals=np.inf,
-                 cutoff_value=None, *args, **kwargs):
+    def __init__(self, problem=None, optimization_type=OptimizationType.MINIMIZATION, repair_function=limit, max_evals=np.inf, cutoff_value=None, *args, **kwargs):
         r"""Initialize task class for optimization.
 
         Args:
@@ -74,17 +72,7 @@ class Task:
             kwargs (dict): Additional args.
 
         """
-        if isinstance(problem, str):
-            params = dict(dimension=dimension, lower=lower, upper=upper)
-            params = {key: val for key, val in params.items() if val is not None}
-            self.problem = get_problem(problem, **params)
-        elif isinstance(problem, Problem):
-            self.problem = problem
-            if dimension is not None or lower is not None or upper is not None:
-                logger.warning('An instance of the Problem class was passed in, `dimension`, `lower` and `upper` parameters will be ignored.')
-        else:
-            raise TypeError('Unsupported type for problem: {}'.format(type(problem)))
-
+        self.problem = problem
         self.optimization_type = optimization_type
         self.dimension = self.problem.dimension
         self.lower = self.problem.lower

@@ -68,11 +68,7 @@ class BareBonesFireworksAlgorithm(OptimizationAlgorithm):
             reduction_coefficient (float): Reduction coefficient :math:`\in (0, 1)`.
 
         """
-        kwargs.pop('population_size', None)
-        super().__init__(1, *args, **kwargs)
-        self.num_sparks = num_sparks
-        self.amplification_coefficient = amplification_coefficient
-        self.reduction_coefficient = reduction_coefficient
+        super().__init__(*args, **kwargs)
 
     def set_parameters(self, num_sparks=10, amplification_coefficient=1.5, reduction_coefficient=0.5, **kwargs):
         r"""Set the arguments of an algorithm.
@@ -88,6 +84,7 @@ class BareBonesFireworksAlgorithm(OptimizationAlgorithm):
         self.num_sparks = num_sparks
         self.amplification_coefficient = amplification_coefficient
         self.reduction_coefficient = reduction_coefficient
+        self.population_size = 1
 
     def get_parameters(self):
         r"""Get parameters of the algorithm.
@@ -97,7 +94,6 @@ class BareBonesFireworksAlgorithm(OptimizationAlgorithm):
 
         """
         params = super().get_parameters()
-        params.pop('population_size', None)
         params.update({
             'num_sparks': self.num_sparks,
             'amplification_coefficient': self.amplification_coefficient,

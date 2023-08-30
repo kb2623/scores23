@@ -40,26 +40,22 @@ class CooperativeCoevolution(OptimizationAlgorithm):
     Name:list[str]=['CooperativeCoevolution', 'CC']
 
     def __init__(self:Self, decompozer:AnalysisAlgorithm, toptimizer:type[OptimizationAlgorithm], *args:list, **kwargs:dict[str, any]) -> None:
-        kwargs.pop('population_size', None)
-        super().__init__(1, *args, **kwargs)
-        # set decompozer
-        self.decompozer = decompozer
-        # set optimizer
-        self.toptimizer = toptimizer
-        self.toptimizer_params = {}
+        super().__init__(decompozer=decompozer, toptimizer=toptimizer, *args, **kwargs)
 
-    def set_parameters(self:Self, decompozer:AnalysisAlgorithm, toptimizer:type[OptimizationAlgorithm], **kwargs:dict[str, any]) -> None:
-        kwargs.pop('population_size', None)
+    def set_parameters(self:Self, decompozer:AnalysisAlgorithm, toptimizer:type[OptimizationAlgorithm], population_size=65, **kwargs:dict[str, any]) -> None:
         super().set_parameters(**kwargs)
+        self.population_size = population_size
         # set decompozer
         self.decompozer = decompozer
         # set optimizer
         self.toptimizer = toptimizer
+        # set empty optimizer parameters
+        self.toptimizer_params = {}
 
     def get_parameters(self:Self) -> dict[str, any]:
         params = super().get_parameters()
-        params.pop('population_size', None)
         params.update({
+            'population_size': self.population_size,
             'decompozer': self.decompozer.Name[0],
             'optimizer': self.toptimizer.Name[0]
         })

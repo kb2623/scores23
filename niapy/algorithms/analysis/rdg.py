@@ -259,7 +259,7 @@ class RecursiveDifferentialGroupingV2(RecursiveDifferentialGrouping):
         return mu / (1 - mu)
 
 
-class RecursiveDifferentialGroupingV3(RecursiveDifferentialGrouping):
+class RecursiveDifferentialGroupingV3(RecursiveDifferentialGroupingV2):
     r"""Implementation of recursive differential grouping version 3.
 
     Algorithm:
@@ -318,10 +318,11 @@ class RecursiveDifferentialGroupingV3(RecursiveDifferentialGrouping):
         """
         return r"""Sun Y, Li X, Erst A, Omidvar, M N. Decomposition for Large-scale Optimization Problems with Overlapping Components. In 2019 IEEE Congress on Evolutionary Computation (CEC), pp. 326-333. IEEE, 2019."""
 
-    def set_parameters(self, alpha=None, tn=None, *args, **kwargs):
+    def set_parameters(self, n=None, alpha=None, tn=None, *args, **kwargs):
         r"""Set the algorithm parameters/arguments.
 
         Args:
+            n (Optional[int]): TODO.
             alpha (Optional[float]): TODO.
             tn (Optional[int]): Number of starting population.
             args (list): Additional list parameters.
@@ -329,12 +330,14 @@ class RecursiveDifferentialGroupingV3(RecursiveDifferentialGrouping):
 
         """
         super().set_parameters(**kwargs)
+        self.n = n if n else 50
         self.alpha = alpha if alpha else 1e-12
         self.tn = tn if tn else 50
 
     def get_parameters(self):
         d = super().get_parameters()
         d.update({
+            'n': self.n,
             'alpha': self.alpha,
             'tn': self.tn
         })
