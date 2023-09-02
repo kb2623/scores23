@@ -67,33 +67,7 @@ class ParticleSwarmAlgorithm(OptimizationAlgorithm):
         """
         return r"""Kennedy, J. and Eberhart, R. "Particle Swarm Optimization". Proceedings of IEEE International Conference on Neural Networks. IV. pp. 1942--1948, 1995."""
 
-    def __init__(self, population_size=25, c1=2.0, c2=2.0, w=0.7, min_velocity=-1.5, max_velocity=1.5, repair=reflect,
-                 *args, **kwargs):
-        """Initialize ParticleSwarmAlgorithm.
-
-        Args:
-            population_size (int): Population size
-            c1 (float): Cognitive component.
-            c2 (float): Social component.
-            w (Union[float, numpy.ndarray]): Inertial weight.
-            min_velocity (Union[float, numpy.ndarray]): Minimal velocity.
-            max_velocity (Union[float, numpy.ndarray]): Maximal velocity.
-            repair (Callable[[np.ndarray, np.ndarray, np.ndarray, dict], np.ndarray]): Repair method for velocity.
-
-        See Also:
-            * :func:`niapy.algorithms.Algorithm.__init__`
-
-        """
-        super().__init__(population_size, *args, **kwargs)
-        self.c1 = c1
-        self.c2 = c2
-        self.w = w
-        self.min_velocity = min_velocity
-        self.max_velocity = max_velocity
-        self.repair = repair
-
-    def set_parameters(self, population_size=25, c1=2.0, c2=2.0, w=0.7, min_velocity=-1.5, max_velocity=1.5,
-                       repair=reflect, **kwargs):
+    def set_parameters(self, population_size=25, c1=2.0, c2=2.0, w=0.7, min_velocity=-1.5, max_velocity=1.5, repair=reflect, **kwargs):
         r"""Set Particle Swarm Algorithm main parameters.
 
         Args:
@@ -254,8 +228,7 @@ class ParticleSwarmAlgorithm(OptimizationAlgorithm):
                 personal_best[i], personal_best_fitness[i] = pop[i].copy(), fpop[i]
             if fpop[i] < fxb:
                 xb, fxb = pop[i].copy(), fpop[i]
-        return pop, fpop, xb, fxb, {'personal_best': personal_best, 'personal_best_fitness': personal_best_fitness,
-                                    'w': w, 'min_velocity': min_velocity, 'max_velocity': max_velocity, 'v': v}
+        return pop, fpop, xb, fxb, {'personal_best': personal_best, 'personal_best_fitness': personal_best_fitness, 'w': w, 'min_velocity': min_velocity, 'max_velocity': max_velocity, 'v': v}
 
 
 class ParticleSwarmOptimization(ParticleSwarmAlgorithm):
@@ -302,9 +275,6 @@ class ParticleSwarmOptimization(ParticleSwarmAlgorithm):
     def __init__(self, *args, **kwargs):
         """Initialize ParticleSwarmOptimization."""
         super().__init__(*args, **kwargs)
-        self.w = 1.0
-        self.min_velocity = -np.inf
-        self.max_velocity = np.inf
 
     def set_parameters(self, **kwargs):
         r"""Set core parameters of algorithm.
@@ -391,10 +361,6 @@ class OppositionVelocityClampingParticleSwarmOptimization(ParticleSwarmAlgorithm
         """
         kwargs.pop('w', None)
         super().__init__(w=w_max, c1=c1, c2=c2, *args, **kwargs)
-        self.p0 = p0
-        self.w_min = w_min
-        self.w_max = w_max
-        self.sigma = sigma
 
     def set_parameters(self, p0=.3, w_min=.4, w_max=.9, sigma=.1, c1=1.49612, c2=1.49612, **kwargs):
         r"""Set core algorithm parameters.
@@ -696,7 +662,6 @@ class MutatedParticleSwarmOptimization(ParticleSwarmAlgorithm):
         """Initialize MPSO."""
         kwargs.pop('min_velocity', None), kwargs.pop('max_velocity', None)
         super().__init__(min_velocity=-np.inf, max_velocity=np.inf, *args, **kwargs)
-        self.num_mutations = num_mutations
 
     def set_parameters(self, num_mutations=10, **kwargs):
         r"""Set core algorithm parameters.
@@ -808,7 +773,6 @@ class MutatedCenterParticleSwarmOptimization(CenterParticleSwarmOptimization):
         """Initialize MCPSO."""
         kwargs.pop('min_velocity', None), kwargs.pop('max_velocity', None)
         super().__init__(min_velocity=-np.inf, max_velocity=np.inf, *args, **kwargs)
-        self.num_mutations = num_mutations
 
     def set_parameters(self, num_mutations=10, **kwargs):
         r"""Set core algorithm parameters.
@@ -990,10 +954,6 @@ class ComprehensiveLearningParticleSwarmOptimizer(ParticleSwarmAlgorithm):
     def __init__(self, m=10, w0=.9, w1=.4, c=1.49445, *args, **kwargs):
         """Initialize CLPSO."""
         super().__init__(*args, **kwargs)
-        self.m = m
-        self.w0 = w0
-        self.w1 = w1
-        self.c = c
 
     def set_parameters(self, m=10, w0=.9, w1=.4, c=1.49445, **kwargs):
         r"""Set Particle Swarm Algorithm main parameters.
@@ -1157,6 +1117,5 @@ class ComprehensiveLearningParticleSwarmOptimizer(ParticleSwarmAlgorithm):
                     personal_best[i], personal_best_fitness[i] = pop[i].copy(), fpop[i]
                     if fpop[i] < fxb:
                         xb, fxb = pop[i].copy(), fpop[i]
-        return pop, fpop, xb, fxb, {'personal_best': personal_best, 'personal_best_fitness': personal_best_fitness,
-                                    'min_velocity': min_velocity,
-                                    'max_velocity': max_velocity, 'v': v, 'flag': flag, 'pc': pc}
+        return pop, fpop, xb, fxb, {'personal_best': personal_best, 'personal_best_fitness': personal_best_fitness, 'min_velocity': min_velocity, 'max_velocity': max_velocity, 'v': v, 'flag': flag, 'pc': pc}
+

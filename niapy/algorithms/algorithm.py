@@ -254,8 +254,7 @@ class OptimizationAlgorithm(Algorithm):
 
         Args:
             population_size (Optional[int]): Population size.
-            initialization_function (Optional[Callable[[int, Task, numpy.random.Generator, Dict[str, Any]], Tuple[numpy.ndarray, numpy.ndarray[float]]]]):
-                Population initialization function.
+            initialization_function (Optional[Callable[[int, Task, numpy.random.Generator, Dict[str, Any]], Tuple[numpy.ndarray, numpy.ndarray[float]]]]): Population initialization function.
 
         See Also:
             * :func:`niapy.algorithms.Algorithm.set_parameters`
@@ -263,7 +262,7 @@ class OptimizationAlgorithm(Algorithm):
         """
         super().__init__(*args, **kwargs)
 
-    def set_parameters(self, initialization_function=default_numpy_init, *args, **kwargs):
+    def set_parameters(self, population_size=1, initialization_function=default_numpy_init, *args, **kwargs):
         r"""Set the parameters/arguments of the algorithm.
 
         Args:
@@ -276,6 +275,7 @@ class OptimizationAlgorithm(Algorithm):
 
         """
         super().set_parameters(*args, **kwargs)
+        self.population_size = population_size
         self.initialization_function = initialization_function
 
     def get_parameters(self):

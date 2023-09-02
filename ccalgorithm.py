@@ -131,7 +131,7 @@ class CooperativeCoevolution(OptimizationAlgorithm):
         update = False
         for i, t in enumerate(tasks):
             obest_x = np.copy(bests_x[i])
-            population[i], population_fitness[i], bests_x[i], bests_fitness[i], algs_params[i] = algs[i].run_iteration(t, population[i], population_fitness[i], bests_x[i], bests_fitness[i], iters, **algs_params[i])
+            population[i], population_fitness[i], bests_x[i], bests_fitness[i], algs_params[i] = algs[i].run_iteration(t, population[i], population_fitness[i], bests_x[i], bests_fitness[i], iters=iters, **algs_params[i])
             if np.sum(obest_x - bests_x[i]) > 0: update = True
             if bests_fitness[i] < best_fitness:
                 best_x = np.copy(task.lower)

@@ -57,12 +57,10 @@ class CooperativeCoevolutionV1(OptimizationAlgorithm):
     def init_population(self:Self, task:Task) -> Tuple[np.ndarray, np.ndarray, dict[str, any]]:
         # get groups
         G = self.decompozer.run(task)
-        breakpoint()
         groups, seps = [], []
         for e in G:
             if len(e) == 1: seps.append(e[0])
             else: groups.append(e)
-        breakpoint()
         # init task for algorithms
         if len(seps) > 0: groups.append(seps)
         # init algorithms based on group sizes 
@@ -79,12 +77,12 @@ class CooperativeCoevolutionV1(OptimizationAlgorithm):
         # sort and select best
         xf_si = np.argsort(popf)
         s = int(len(pop) / len(groups))
-        breakpoint()
-        return pop[xf_si[:s]], popf[xf_si[:s]], {'groups': groups, 'algs': algs, 'algs_params': algs_params}
+        if len(pop) > 1: pop, popf = pop[xf_si[:s]], popf[xf_si[:s]]
+        return pop, popf, {'groups': groups, 'algs': algs, 'algs_params': algs_params}
 
-    def run_iteration(self:Self, task:Task, groups:Union[list[int], set[int], np.ndarray], population:np.ndarray, population_fitness:np.ndarray, best_x:np.ndarray, best_fitness:np.ndarray, iters:int, algs:list[OptimizationAlgorithm], algs_params:list[dict[str, any]], *args, **params:dict[str, any]) -> Tuple[np.ndarray, np.ndarray, np.ndarray, float, dict[str, any]]:
+    def run_iteration(self:Self, task:Task, population:np.ndarray, population_fitness:np.ndarray, best_x:np.ndarray, best_fitness:np.ndarray, iters:int, groups:Union[list[int], set[int], np.ndarray], algs:list[OptimizationAlgorithm], algs_params:list[dict[str, any]], *args, **params:dict[str, any]) -> Tuple[np.ndarray, np.ndarray, np.ndarray, float, dict[str, any]]:
         for g in groups:
-            pop, fpop, xb, fxb, params = self.run_iteration(task=task, groups=groups, population=pop, population_fitness=fpop, best_x=xb, best_fitness=fxb, iters=iters, **params)
+            pop, fpop, xb, fxb, params = self.run_iteration(task=task, population=pop, population_fitness=fpop, best_x=xb, best_fitness=fxb, iters=iters, groups=groups, *args, **params)
             # TODO if need be
         return population, population_fitness, best_x, best_fitness, bests_x, bests_fitness, {'groups': groups, 'seps': seps, 'tasks': tasks, 'algs': algs, 'algs_params': algs_params}
 

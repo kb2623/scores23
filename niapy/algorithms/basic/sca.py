@@ -88,7 +88,6 @@ class SineCosineAlgorithm(OptimizationAlgorithm):
 
         """
         super().set_parameters(population_size=population_size, **kwargs)
-        self.population_size = population_size
         self.a = a
         self.r_min = r_min
         self.r_max = r_max
@@ -158,3 +157,4 @@ class SineCosineAlgorithm(OptimizationAlgorithm):
         population_fitness = np.apply_along_axis(task.eval, 1, population)
         best_x, best_fitness = self.get_best(population, population_fitness, best_x, best_fitness)
         return population, population_fitness, best_x, best_fitness, {}
+

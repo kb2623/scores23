@@ -1,4 +1,5 @@
 # encoding=utf8
+import os
 import sys
 import timeit
 
@@ -23,13 +24,22 @@ from niapy.algorithms.basic import (
     BatAlgorithm
 )
 
-from niapy.algorithms.ccbasic import (
-    CEBareBonesFireworksAlgorithm,
-    CESineCosineAlgorithm
-)
-
 from ccalgorithm import CooperativeCoevolution
-from ccalgorithmv1 import CooperativeCoevolutionV1
+
+
+def run_test_func(no_fun:int, max_evals:int = 3e6) -> None:
+    if 1 < no_fun > 15: raise Exception('Function between 1 and 15!!!')
+    bench = Benchmark()
+    info = bench.get_info(no_fun)
+    fun_fitness = bench.get_function(no_fun)
+    start = timeit.default_timer()
+    i = 0
+    while i < max_evals:
+        sol = info['lower'] + rand(info['dimension']) * (info['upper'] - info['lower'])
+        fun_fitness(sol)
+        i += 1
+    end = timeit.default_timer()
+    print('Time of execution for f%d for %d evals = %fs' % (no_fun, max_evals, end - start))
 
 
 class CEC2013lsgoTask(Task):
@@ -71,6 +81,9 @@ def run_algo(id:int, talgo:type, no_fun:int, *args:list, **kwargs:dict) -> None:
     start = timeit.default_timer()
     best = algo.run(task)
     stop = timeit.default_timer()
+    if not os.path.exists('./%s.cec2013lso.%d.csv' % (algo.Name[1], no_fun)):
+        with open('%s.cec2013lso.%d.csv' % (algo.Name[1], no_fun), 'w') as csvfile:
+            csvfile.write('seed, f1, f2, f3, time\n')
     with open('%s.cec2013lso.%d.csv' % (algo.Name[1], no_fun), 'a') as csvfile:
         f1, f2, f3 = task.get_mesures()
         csvfile.write('%d, %f, %f, %f, %f\n' % (id, f1, f2, f3, stop - start))
@@ -120,53 +133,35 @@ def no_groups(a:list) -> int:
     return s
 
 
-def run_rdg_cec2013(alpha:float = 1e-12, NP:int = 50, seed:int = 1, no_fun:int = 1) -> None:
+def run_rdg_cec2013(no_fun:int = 1, seed:int = 1, alpha:float = 1e-12, NP:int = 50) -> None:
     algo = RecursiveDifferentialGroupingV3(seed=seed)
-    task = CEC2013lsgoTask(no_fun=no_fun)
     algo.set_parameters(n=NP, alpha=alpha)
-    best = algo.run(task)
-    print('groups: %s\nno. groups: %d\tno. seps: %d\nno. evals: %d' % (best, no_groups(best), no_seps(best), task.evals))
-    print(algo.Name[-1], ': ', algo.get_parameters())
-
-
-def run_xdg_cec2013(alpha:float = 1e-12, NP:int = 50, seed:int = 1, no_fun:int = 1) -> None:
-    algo = ExtendedDifferentialGrouping(seed=seed)
     task = CEC2013lsgoTask(no_fun=no_fun)
-    # Get better mesurement for epsilon
-    X = algo.rng.uniform(task.lower, task.upper, (NP, task.dimension))
-    Xf = np.apply_along_axis(task.eval, 1, X)
-    epsilon = alpha * np.min(Xf)
-    # Set new epsilon
-    algo.set_parameters(epsilon=epsilon)
-    best = algo.run(task=task)
-    print('groups: %s\nno. groups: %s\nno. seps: %s\tno. evals: %d' % (best, no_groups(best), no_seps(best), task.evals))
-    print(algo.Name[-1], ': ', algo.get_parameters())
-
-
-def run_test_func(no_fun:int, max_evals:int = 3e6) -> None:
-    if 1 < no_fun > 15: raise Exception('Function between 1 and 15!!!')
-    bench = Benchmark()
-    info = bench.get_info(no_fun)
-    fun_fitness = bench.get_function(no_fun)
     start = timeit.default_timer()
-    i = 0
-    while i < max_evals:
-        sol = info['lower'] + rand(info['dimension']) * (info['upper'] - info['lower'])
-        fun_fitness(sol)
-        i += 1
-    end = timeit.default_timer()
-    print('Time of execution for f%d for %d evals = %fs' % (no_fun, max_evals, end - start))
+    best = algo.run(task)
+    stop = timeit.default_timer()
+    if not os.path.exists('./%s.cec2013lso.%d.csv' % (algo.Name[1], no_fun)):
+        with open('%s.cec2013lso.%d.csv' % (algo.Name[1], no_fun), 'w') as csvfile:
+            csvfile.write('seed, no_groups, no_seps, evals, time\n')
+    with open('%s.cec2013lso.%d.csv' % (algo.Name[1], no_fun), 'a') as csvfile:
+        csvfile.write('%d, %d, %d, %d, %f\n' % (seed, no_groups(best), no_seps(best), task.evals, stop - start))
 
 
 def run_cc_cec2013(no_fun:int = 1, seed:int = 1) -> None:
     # BareBonesFireworksAlgorithm
-    algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(seed=seed), BareBonesFireworksAlgorithm, seed=seed)
-    algo.set_decomposer_parameters(n=50, alpha=1e-12, tn=50)
-    algo.set_optimizer_parameters(num_sparks=10, amplification_coefficient=1.75, reduction_coefficient=0.75)
+    #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(seed=seed), BareBonesFireworksAlgorithm, seed=seed)
+    #algo.set_decomposer_parameters(n=50, alpha=1e-12, tn=50)
+    #algo.set_optimizer_parameters(num_sparks=10, amplification_coefficient=1.75, reduction_coefficient=0.75)
     # SineCosineAlgorithm
     #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(seed=seed), SineCosineAlgorithm, population_size=150, seed=seed)
     #algo.set_decomposer_parameters(n=50, alpha=1e-12)
     #algo.set_optimizer_parameters(num_sparks=10, amplification_coefficient=1.75, reduction_coefficient=0.75)
+    # ParticleSwarmAlgorithm
+    #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(seed=seed), ParticleSwarmAlgorithm, seed=seed)
+    #algo.set_decomposer_parameters(n=50, alpha=1e-12)
+    # FireflyAlgorithm
+    algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(seed=seed), FireflyAlgorithm, seed=seed)
+    algo.set_decomposer_parameters(n=50, alpha=1e-12)
     # create a test cec2013lsgo
     task = CEC2013lsgoTask(no_fun=no_fun)
     # start optimization of the task
@@ -175,27 +170,9 @@ def run_cc_cec2013(no_fun:int = 1, seed:int = 1) -> None:
     stop = timeit.default_timer()
     print('res: ', res)
     print('test: %s -> %f' % (task.x, task.x_f))
-    with open('%s.%s.cec2013lso.%d.csv' % (algo.decompozer.Name[1], algo.toptimizer.Name[1], no_fun), 'a') as csvfile:
-        f1, f2, f3 = task.get_mesures()
-        csvfile.write('%d, %f, %f, %f, %f\n' % (seed, f1, f2, f3, stop - start))
-
-
-def run_ccv1_cec2013(no_fun:int = 1, seed:int = 1) -> None:
-    # BareBonesFireworksAlgorithm
-    algo = CooperativeCoevolutionV1(RecursiveDifferentialGroupingV3(seed=seed), CEBareBonesFireworksAlgorithm, population_size=65, seed=seed)
-    algo.set_decomposer_parameters(n=50, alpha=1e-12, tn=50)
-    algo.set_optimizer_parameters(num_sparks=10, amplification_coefficient=1.75, reduction_coefficient=0.75)
-    # SineCosineAlgorithm
-    #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(), CESineCosineAlgorithm, population_size=150, seed=seed)
-    #algo.set_optimizer_parameters(num_sparks=10, amplification_coefficient=1.75, reduction_coefficient=0.75)
-    # create a test cec2013lsgo
-    task = CEC2013lsgoTask(no_fun=no_fun)
-    # start optimization of the task
-    start = timeit.default_timer()
-    res = algo.run(task)
-    stop = timeit.default_timer()
-    print('res: ', res)
-    print('test: %s -> %f' % (task.x, task.x_f))
+    if not os.path.exists('%s.%s.cec2013lso.%d.csv' % (algo.decompozer.Name[1], algo.toptimizer.Name[1], no_fun)):
+        with open('%s.%s.cec2013lso.%d.csv' % (algo.decompozer.Name[1], algo.toptimizer.Name[1], no_fun), 'w') as csvfile:
+            csvfile.write('seed, f1, f2, f3, time\n')
     with open('%s.%s.cec2013lso.%d.csv' % (algo.decompozer.Name[1], algo.toptimizer.Name[1], no_fun), 'a') as csvfile:
         f1, f2, f3 = task.get_mesures()
         csvfile.write('%d, %f, %f, %f, %f\n' % (seed, f1, f2, f3, stop - start))
@@ -206,9 +183,7 @@ if __name__ == "__main__":
     arg_seed = int(sys.argv[2]) if len(sys.argv) > 2 else 1
     np.set_printoptions(linewidth=np.inf)
     #run_test_func(no_fun=arg_no_fun)
-    #run_rdg_cec2013(no_fun=arg_no_fun)
-    #run_xdg_cec2013(no_fun=arg_no_fun)
+    #run_rdg_cec2013(no_fun=arg_no_fun, seed=arg_seed)
     #run_bbfwa_cec2013(no_fun=arg_no_fun)
     run_cc_cec2013(no_fun=arg_no_fun, seed=arg_seed)
-    #run_ccv1_cec2013(no_fun=arg_no_fun, seed=arg_seed)
 
