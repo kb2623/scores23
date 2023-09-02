@@ -151,17 +151,15 @@ def run_cc_cec2013(no_fun:int = 1, seed:int = 1) -> None:
     # BareBonesFireworksAlgorithm
     #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(seed=seed), BareBonesFireworksAlgorithm, seed=seed)
     #algo.set_decomposer_parameters(n=50, alpha=1e-12, tn=50)
-    #algo.set_optimizer_parameters(num_sparks=10, amplification_coefficient=1.75, reduction_coefficient=0.75)
     # SineCosineAlgorithm
     #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(seed=seed), SineCosineAlgorithm, population_size=150, seed=seed)
-    #algo.set_decomposer_parameters(n=50, alpha=1e-12)
-    #algo.set_optimizer_parameters(num_sparks=10, amplification_coefficient=1.75, reduction_coefficient=0.75)
+    #algo.set_decomposer_parameters(n=50, alpha=1e-12, tn=50)
     # ParticleSwarmAlgorithm
     #algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(seed=seed), ParticleSwarmAlgorithm, seed=seed)
-    #algo.set_decomposer_parameters(n=50, alpha=1e-12)
+    #algo.set_decomposer_parameters(n=50, alpha=1e-12, tn=50)
     # FireflyAlgorithm
     algo = CooperativeCoevolution(RecursiveDifferentialGroupingV3(seed=seed), FireflyAlgorithm, seed=seed)
-    algo.set_decomposer_parameters(n=50, alpha=1e-12)
+    algo.set_decomposer_parameters(n=50, alpha=1e-12, tn=50)
     # create a test cec2013lsgo
     task = CEC2013lsgoTask(no_fun=no_fun)
     # start optimization of the task
