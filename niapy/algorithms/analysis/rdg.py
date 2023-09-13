@@ -291,7 +291,7 @@ class RecursiveDifferentialGroupingV3(RecursiveDifferentialGroupingV2):
 
     Name = ['RecursiveDifferentialGroupingV3', 'RDGv3']
 
-    def __init__(self, alpha=sys.float_info.epsilon, tn=50, *args, **kwargs):
+    def __init__(self, tn=50, *args, **kwargs):
         """Initialize RecursiveDifferentialGrouping.
 
         Args:
@@ -302,8 +302,6 @@ class RecursiveDifferentialGroupingV3(RecursiveDifferentialGroupingV2):
 
         """
         super().__init__(*args, **kwargs)
-        self.alpha = alpha
-        self.tn = tn
 
     @staticmethod
     def info():
@@ -318,7 +316,7 @@ class RecursiveDifferentialGroupingV3(RecursiveDifferentialGroupingV2):
         """
         return r"""Sun Y, Li X, Erst A, Omidvar, M N. Decomposition for Large-scale Optimization Problems with Overlapping Components. In 2019 IEEE Congress on Evolutionary Computation (CEC), pp. 326-333. IEEE, 2019."""
 
-    def set_parameters(self, n=None, alpha=None, tn=None, *args, **kwargs):
+    def set_parameters(self, tn=None, *args, **kwargs):
         r"""Set the algorithm parameters/arguments.
 
         Args:
@@ -330,15 +328,12 @@ class RecursiveDifferentialGroupingV3(RecursiveDifferentialGroupingV2):
 
         """
         super().set_parameters(**kwargs)
-        self.n = n if n else 50
-        self.alpha = alpha if alpha else 1e-12
         self.tn = tn if tn else 50
 
     def get_parameters(self):
         d = super().get_parameters()
+        d.pop('n', None)
         d.update({
-            'n': self.n,
-            'alpha': self.alpha,
             'tn': self.tn
         })
         return d
@@ -355,16 +350,14 @@ class RecursiveDifferentialGroupingV3(RecursiveDifferentialGroupingV2):
             list[Union[list, list[int]]]: Groups.
 
         """
-        _, fpop = default_numpy_init(task, self.n, self.rng)
         seps, allgroups = [], []
-        epsilon = np.min(np.abs(fpop)) * self.alpha
         sub1, sub2 = [0], [i + 1 for i in range(task.dimension - 1)]
         xremain = [0]
         p1 = np.copy(task.lower)
         p1f = task.eval(p1)
         while len(xremain) > 0:
             xremain = []
-            sub1_a = self.interact(task, p1, p1f, epsilon, sub1, sub2, xremain)
+            sub1_a = self.interact(task, p1, p1f, 0, sub1, sub2, xremain)
             if np.size(sub1_a) != np.size(sub1) and np.size(sub1_a) < self.tn:
                 sub1 = sub1_a
                 sub2 = xremain
